@@ -31,10 +31,6 @@ def push_prompt_to_langsmith(prompt_name: str, prompt_data: dict) -> bool:
         True se sucesso, False caso contrário
     """
     try:
-        techniques = prompt_data.get("techniques")
-        for technique in techniques:
-            print(f"🔍 Técnica aplicada: {technique}")
-
         prompt_obj = ChatPromptTemplate.from_messages([
             ("system", prompt_data.get("system_prompt")),
             ("user", prompt_data.get("user_prompt"))
@@ -45,7 +41,8 @@ def push_prompt_to_langsmith(prompt_name: str, prompt_data: dict) -> bool:
             prompt_name, 
             object=prompt_obj, 
             tags=prompt_data.get("tags"), 
-            description=prompt_data.get("description")
+            description=prompt_data.get("description"),
+            readme="Técnicas aplicadas: " + ", ".join(prompt_data.get("techniques"))
         )
         print(f"✅ Prompt '{prompt_name}' publicado com sucesso! URL: {url}")
         return True
