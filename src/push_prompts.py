@@ -10,10 +10,9 @@ Este script:
 SIMPLIFICADO: Código mais limpo e direto ao ponto.
 """
 
-import os
 import sys
 from dotenv import load_dotenv
-from langchain import hub
+from langsmith import Client
 from langchain_core.prompts import ChatPromptTemplate
 from utils import load_yaml, check_env_vars, print_section_header
 
@@ -31,7 +30,28 @@ def push_prompt_to_langsmith(prompt_name: str, prompt_data: dict) -> bool:
     Returns:
         True se sucesso, False caso contrário
     """
-    ...
+    try:
+        techniques = prompt_data.get("techniques")
+        for technique in techniques:
+            print(f"🔍 Técnica aplicada: {technique}")
+
+        prompt_obj = ChatPromptTemplate.from_messages([
+            ("system", prompt_data.get("system_prompt")),
+            ("user", prompt_data.get("user_prompt"))
+        ])
+
+        client = Client()
+        url = client.push_prompt(
+            prompt_name, 
+            object=prompt_obj, 
+            tags=prompt_data.get("tags"), 
+            description=prompt_data.get("description")
+        )
+        print(f"✅ Prompt '{prompt_name}' publicado com sucesso! URL: {url}")
+        return True
+    except Exception as e:
+        print(f"❌ Erro ao fazer push do prompt: {e}")
+        return False
 
 
 def validate_prompt(prompt_data: dict) -> tuple[bool, list]:
@@ -44,12 +64,45 @@ def validate_prompt(prompt_data: dict) -> tuple[bool, list]:
     Returns:
         (is_valid, errors) - Tupla com status e lista de erros
     """
-    ...
+    errors = []
+    if "name" not in prompt_data or not prompt_data["name"]:
+        errors.append("Campo 'name' é obrigatório.")
+    if "description" not in prompt_data or not prompt_data["description"]:
+        errors.append("Campo 'description' é obrigatório.")
+    if "system_prompt" not in prompt_data or not prompt_data["system_prompt"]:
+        errors.append("Campo 'system_prompt' é obrigatório.")
+    if "user_prompt" not in prompt_data or not prompt_data["user_prompt"]:
+        errors.append("Campo 'user_prompt' é obrigatório.")
+    if "tags" not in prompt_data or not isinstance(prompt_data["tags"], list):
+        errors.append("Campo 'tags' é obrigatório e deve ser uma lista.")
+    if "techniques" not in prompt_data or not isinstance(prompt_data["techniques"], list):
+        errors.append("Campo 'techniques' é obrigatório e deve ser uma lista.")
+    return (len(errors) == 0, errors)
 
 
 def main():
-    """Função principal"""
-    ...
+    print_section_header("Push de Prompts ao LangSmith Prompt Hub")
+    
+    required_vars = ["LANGSMITH_API_KEY"]
+    if not check_env_vars(required_vars):
+        return 1
+    
+    prompt_data = load_yaml("prompts/bug_to_user_story_v2.yml")
+    if not prompt_data:
+        print("❌ Erro ao carregar o prompt otimizado.")
+        return 1
+    
+    is_valid, errors = validate_prompt(prompt_data)
+    if not is_valid:
+        print("❌ Erros de validação encontrados:")
+        for error in errors:
+            print(f" - {error}")
+        return 1
+
+    if not push_prompt_to_langsmith(prompt_data.get("name"), prompt_data):
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":

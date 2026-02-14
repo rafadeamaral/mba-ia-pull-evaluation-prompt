@@ -46,14 +46,13 @@ def extract_prompt_from_response(prompt) -> dict:
     repo_name = prompt.metadata.get("lc_hub_repo")
     
     return {
-        repo_name: {
-            "description": "Prompt para converter relatos de bugs em User Stories",
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt,
-            "version": "v1",
-            "created_at": date.today(),
-            "tags": ["bug-analysis", "user-story", "product-management"]
-        }
+        "name": repo_name,
+        "description": "Prompt para converter relatos de bugs em User Stories",
+        "system_prompt": system_prompt,
+        "user_prompt": user_prompt,
+        "version": "v1",
+        "created_at": date.today(),
+        "tags": ["bug-analysis", "user-story", "product-management"]
     }
 
 def main():
