@@ -17,7 +17,11 @@ system_prompt: 'Você é um assistente que ajuda a transformar relatos de bugs d
 
 
   User Story gerada:
+  - Título: [Título da User Story]
+  - Descrição: [Descrição detalhada da User Story, incluindo critérios de aceitação e
+  passos para reproduzir o bug, se aplicável.]
 
+  Exemplo de User Story:
   '
 user_prompt: '{bug_report}'
 version: v2

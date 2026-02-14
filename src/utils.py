@@ -128,7 +128,7 @@ def validate_prompt_structure(prompt_data: Dict[str, Any]) -> tuple[bool, list]:
     """
     errors = []
 
-    required_fields = ['description', 'system_prompt', 'version']
+    required_fields = ['name', 'description', 'system_prompt', 'user_prompt', 'version', 'tags', 'techniques']
     for field in required_fields:
         if field not in prompt_data:
             errors.append(f"Campo obrigatório faltando: {field}")
@@ -140,7 +140,14 @@ def validate_prompt_structure(prompt_data: Dict[str, Any]) -> tuple[bool, list]:
     if 'TODO' in system_prompt:
         errors.append("system_prompt ainda contém TODOs")
 
-    techniques = prompt_data.get('techniques_applied', [])
+    user_prompt = prompt_data.get('user_prompt', '').strip()
+    if not user_prompt:
+        errors.append("user_prompt está vazio")
+
+    if 'TODO' in user_prompt:
+        errors.append("user_prompt ainda contém TODOs")
+    
+    techniques = prompt_data.get('techniques', [])
     if len(techniques) < 2:
         errors.append(f"Mínimo de 2 técnicas requeridas, encontradas: {len(techniques)}")
 

@@ -14,7 +14,7 @@ import sys
 from dotenv import load_dotenv
 from langsmith import Client
 from langchain_core.prompts import ChatPromptTemplate
-from utils import load_yaml, check_env_vars, print_section_header
+from utils import load_yaml, check_env_vars, print_section_header, validate_prompt_structure
 
 load_dotenv()
 
@@ -54,32 +54,6 @@ def push_prompt_to_langsmith(prompt_name: str, prompt_data: dict) -> bool:
         return False
 
 
-def validate_prompt(prompt_data: dict) -> tuple[bool, list]:
-    """
-    Valida estrutura básica de um prompt (versão simplificada).
-
-    Args:
-        prompt_data: Dados do prompt
-
-    Returns:
-        (is_valid, errors) - Tupla com status e lista de erros
-    """
-    errors = []
-    if "name" not in prompt_data or not prompt_data["name"]:
-        errors.append("Campo 'name' é obrigatório.")
-    if "description" not in prompt_data or not prompt_data["description"]:
-        errors.append("Campo 'description' é obrigatório.")
-    if "system_prompt" not in prompt_data or not prompt_data["system_prompt"]:
-        errors.append("Campo 'system_prompt' é obrigatório.")
-    if "user_prompt" not in prompt_data or not prompt_data["user_prompt"]:
-        errors.append("Campo 'user_prompt' é obrigatório.")
-    if "tags" not in prompt_data or not isinstance(prompt_data["tags"], list):
-        errors.append("Campo 'tags' é obrigatório e deve ser uma lista.")
-    if "techniques" not in prompt_data or not isinstance(prompt_data["techniques"], list):
-        errors.append("Campo 'techniques' é obrigatório e deve ser uma lista.")
-    return (len(errors) == 0, errors)
-
-
 def main():
     print_section_header("Push de Prompts ao LangSmith Prompt Hub")
     
@@ -92,7 +66,7 @@ def main():
         print("❌ Erro ao carregar o prompt otimizado.")
         return 1
     
-    is_valid, errors = validate_prompt(prompt_data)
+    is_valid, errors = validate_prompt_structure(prompt_data)
     if not is_valid:
         print("❌ Erros de validação encontrados:")
         for error in errors:
