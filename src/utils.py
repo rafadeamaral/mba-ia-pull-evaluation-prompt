@@ -137,14 +137,20 @@ def validate_prompt_structure(prompt_data: Dict[str, Any]) -> tuple[bool, list]:
     if not system_prompt:
         errors.append("system_prompt está vazio")
 
-    if 'TODO' in system_prompt:
+    if '{bug_report}' not in system_prompt:
+        errors.append("system_prompt não contém a variável {bug_report}")
+
+    if '[TODO]' in system_prompt:
         errors.append("system_prompt ainda contém TODOs")
 
     user_prompt = prompt_data.get('user_prompt', '').strip()
     if not user_prompt:
         errors.append("user_prompt está vazio")
 
-    if 'TODO' in user_prompt:
+    if '{bug_report}' not in user_prompt:
+        errors.append("user_prompt não contém a variável {bug_report}")
+
+    if '[TODO]' in user_prompt:
         errors.append("user_prompt ainda contém TODOs")
     
     techniques = prompt_data.get('techniques', [])

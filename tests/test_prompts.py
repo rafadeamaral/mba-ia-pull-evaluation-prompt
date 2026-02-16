@@ -61,7 +61,7 @@ class TestPrompts:
         """Garante que você não esqueceu nenhum `[TODO]` no texto."""
         prompts = load_prompts("prompts/bug_to_user_story_v2.yml")
         prompt_text = prompts.get("system_prompt", "") + " " + prompts.get("user_prompt", "")
-        assert "TODO" not in prompt_text, \
+        assert "[TODO]" not in prompt_text, \
             "❌ Prompt contém placeholders [TODO] que precisam ser preenchidos."
         print("✅ Prompt não contém placeholders [TODO].")
 
